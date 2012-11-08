@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Cdb
+GenericName=Compiler Debugger for myPas
+Comment=Debugger gui for myPas
+Exec=@prefix@/bin/cdb
+Icon=@prefix@/share/cdb/systrayicon.png
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;Accessories;
