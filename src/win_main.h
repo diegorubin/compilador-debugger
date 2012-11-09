@@ -24,14 +24,25 @@
 #define _WIN_MAIN_H_
 
 #include <gtkmm.h>
+#include <glibmm/main.h>
+#include <glibmm/iochannel.h>
 #include <glibmm/i18n.h>
 #include <libnotify/notify.h>
+#include <fcntl.h>
+#include <stdlib.h>
 #include <iostream>
 #include <sstream>
+
+#include <unistd.h> 
+
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "dialog_preferences.h"
 #include "config.h"
 #include "utils.h"
+
+#define input "/tmp/cdb"
 
 using namespace Gtk;
 
@@ -42,9 +53,6 @@ public:
   virtual ~WinMain();
 
   void set_systray(Glib::RefPtr<Gtk::StatusIcon> tray);
-  Glib::ustring get_current_time();
-  Glib::ustring get_current_task_title();
-  Glib::ustring get_cycle();
 
 protected:
 
@@ -54,17 +62,21 @@ private:
 	{
 	public:
 	   ModelColumns()
-	   { add(id); add(title); }
+	   { add(id); add(dttype); add(idtype); add(offset); }
 	   Gtk::TreeModelColumn< Glib::ustring > id;
-	   Gtk::TreeModelColumn< Glib::ustring > title;
+	   Gtk::TreeModelColumn< Glib::ustring > dttype;
+	   Gtk::TreeModelColumn< Glib::ustring > idtype;
+	   Gtk::TreeModelColumn< Glib::ustring > offset;
 	};
 
   // attributes
+  int inputfd;
   bool showed;
-  bool started;
-  unsigned int time_elapsed;
-  unsigned int minutes,seconds;
-  int cycle_number;
+
+  /* for commands */
+  bool symtab;
+
+  Glib::RefPtr<Glib::IOChannel> inputchannel;
 
   Config configs;
 
@@ -94,6 +106,7 @@ private:
   virtual void on_systray_activated();
   virtual void on_systray_popup(guint button, guint activate_time);
   virtual void on_cursor_changed();
+  virtual bool inputcall(Glib::IOCondition io_condition);
 
   // callback methods - menu
   virtual void on_menu_file_quit();

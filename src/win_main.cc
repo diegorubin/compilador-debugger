@@ -29,6 +29,7 @@ WinMain::WinMain(BaseObjectType* cobject,
 {
 
   showed = false;
+  symtab = false;
 
   configs.load();
 
@@ -53,6 +54,28 @@ WinMain::WinMain(BaseObjectType* cobject,
             connect(sigc::mem_fun(*this, &WinMain::on_menu_edit_preferences));
   mnuAbout->signal_activate().
             connect(sigc::mem_fun(*this, &WinMain::on_menu_help_about));
+
+  if (access(input, F_OK) == -1) {
+    // fifo doesn't exit - create it
+    if (mkfifo(input, 0666) != 0) {
+      std::cerr << "error creating fifo" << std::endl;
+      //return -1;
+    }
+  }
+
+  inputfd = open(input, O_RDONLY);
+  if (inputfd == -1)
+  {
+    std::cerr << "error opening fifo" << std::endl;
+    //return -1;
+  }
+  
+  // connect the signal handler
+  Glib::signal_io().connect(sigc::mem_fun(+this,&WinMain::inputcall), inputfd, Glib::IO_IN);
+
+  // Creates a iochannel from the file descriptor
+  inputchannel = Glib::IOChannel::create_from_fd(inputfd);
+
 
 	show_all_children();
 }
@@ -102,7 +125,7 @@ void WinMain::notify(const char *message)
 
   notMessage = notify_notification_new("Cdb",
                                        message,
-                                       CDB_DATADIR "/tomato.png");
+                                       CDB_DATADIR "/systrayicon.png");
   
   notify_notification_set_timeout(notMessage,3000);
 
@@ -136,6 +159,22 @@ void WinMain::on_systray_popup(guint button, guint activate_time)
 
 void WinMain::on_cursor_changed()
 {
+
+}
+
+bool WinMain::inputcall(Glib::IOCondition io_condition)
+{
+    
+  if ((io_condition & Glib::IO_IN) == 0) {
+    std::cerr << "Invalid fifo response" << std::endl;
+  } else {
+    Glib::ustring buf;
+    inputchannel->read_line(buf);
+
+    cout << buf.c_str();
+  }
+
+  return true;
 
 }
 
