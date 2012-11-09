@@ -28,6 +28,8 @@ WinMain::WinMain(BaseObjectType* cobject,
   m_refGlade(refGlade) 
 {
 
+  codecommand = WAITING;
+
   showed = false;
   symtab = false;
 
@@ -55,14 +57,6 @@ WinMain::WinMain(BaseObjectType* cobject,
   mnuAbout->signal_activate().
             connect(sigc::mem_fun(*this, &WinMain::on_menu_help_about));
 
-  if (access(input, F_OK) == -1) {
-    // fifo doesn't exit - create it
-    if (mkfifo(input, 0666) != 0) {
-      std::cerr << "error creating fifo" << std::endl;
-      //return -1;
-    }
-  }
-
   inputfd = open(input, O_RDONLY);
   if (inputfd == -1)
   {
@@ -82,8 +76,6 @@ WinMain::WinMain(BaseObjectType* cobject,
 
 WinMain::~WinMain()
 {
-  if(unlink(input))
-    std::cerr << "error removing fifo" << std::endl;
 }
 
 void WinMain::set_systray(Glib::RefPtr<StatusIcon> tray)
@@ -169,26 +161,24 @@ bool WinMain::inputcall(Glib::IOCondition io_condition)
   Glib::ustring command;
   std::string data;
 
-  int code = 0;
-    
   if ((io_condition & Glib::IO_IN) == 0) {
     std::cerr << "Invalid fifo response" << std::endl;
   } else {
     Glib::ustring buf;
     inputchannel->read_line(buf);
-
-
     data = buf;
-    if(data.substr(0,6) == "update"){
-      cout << "sim" << endl;
-    }
 
+    cout << "Code command: " << codecommand << endl;
 
-    code = atoi(buf.c_str());
-
-    switch(code) {
-      case 0:
+    switch(codecommand) {
+      case WAITING:
+        codecommand = atoi(buf.c_str());
         break;
+      case SYMTABCLEAR:
+        insert_row_in_symtab(data);
+        break;
+      default:
+        codecommand = atoi(buf.c_str());
     }
 
   }
@@ -218,5 +208,16 @@ void WinMain::on_menu_help_about()
   m_refGlade->get_widget("winAbout", abtDialog);
   abtDialog->run();
   abtDialog->hide();
+}
+
+// methods
+void WinMain::insert_row_in_symtab(std::string data)
+{
+  std::stringstream lineStream(data);
+  std::string cell;
+
+  while(std::getline(lineStream,cell,',')) {
+    cout << cell;
+  }
 }
 

@@ -42,9 +42,15 @@
 #include "config.h"
 #include "utils.h"
 
-#define input "/tmp/cdb"
+#define input "/tmp/mypas"
 
 using namespace Gtk;
+
+enum {
+  WAITING=260,
+  SYMTABCLEAR,
+  SYMTABINSERT,
+};
 
 class WinMain: public Gtk::Window
 {
@@ -75,6 +81,7 @@ private:
 
   /* for commands */
   bool symtab;
+  int codecommand;
 
   Glib::RefPtr<Glib::IOChannel> inputchannel;
 
@@ -112,6 +119,9 @@ private:
   virtual void on_menu_file_quit();
   virtual void on_menu_edit_preferences();
   virtual void on_menu_help_about();
+
+  // aux methods
+  virtual void insert_row_in_symtab(std::string data);
 };
 
 #endif //__WIN_MAIN_H_
