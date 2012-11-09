@@ -82,6 +82,8 @@ WinMain::WinMain(BaseObjectType* cobject,
 
 WinMain::~WinMain()
 {
+  if(unlink(input))
+    std::cerr << "error removing fifo" << std::endl;
 }
 
 void WinMain::set_systray(Glib::RefPtr<StatusIcon> tray)
@@ -164,6 +166,8 @@ void WinMain::on_cursor_changed()
 
 bool WinMain::inputcall(Glib::IOCondition io_condition)
 {
+  Glib::ustring command;
+  int code = atoi(buf.c_str()[0]);
     
   if ((io_condition & Glib::IO_IN) == 0) {
     std::cerr << "Invalid fifo response" << std::endl;
@@ -171,7 +175,13 @@ bool WinMain::inputcall(Glib::IOCondition io_condition)
     Glib::ustring buf;
     inputchannel->read_line(buf);
 
-    cout << buf.c_str();
+    code = atoi(buf.c_str()[0]);
+
+    switch(code) {
+      case 0:
+        break;
+    }
+
   }
 
   return true;
