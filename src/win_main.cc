@@ -167,6 +167,8 @@ void WinMain::on_cursor_changed()
 bool WinMain::inputcall(Glib::IOCondition io_condition)
 {
   Glib::ustring command;
+  std::string data;
+
   int code = 0;
     
   if ((io_condition & Glib::IO_IN) == 0) {
@@ -175,7 +177,12 @@ bool WinMain::inputcall(Glib::IOCondition io_condition)
     Glib::ustring buf;
     inputchannel->read_line(buf);
 
-    cout << buf << endl;
+
+    data = buf;
+    if(data.substr(0,6) == "update"){
+      cout << "sim" << endl;
+    }
+
 
     code = atoi(buf.c_str());
 
