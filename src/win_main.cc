@@ -167,7 +167,7 @@ void WinMain::on_cursor_changed()
 bool WinMain::inputcall(Glib::IOCondition io_condition)
 {
   Glib::ustring command;
-  int code = atoi(buf.c_str()[0]);
+  int code = 0;
     
   if ((io_condition & Glib::IO_IN) == 0) {
     std::cerr << "Invalid fifo response" << std::endl;
@@ -175,7 +175,9 @@ bool WinMain::inputcall(Glib::IOCondition io_condition)
     Glib::ustring buf;
     inputchannel->read_line(buf);
 
-    code = atoi(buf.c_str()[0]);
+    cout << buf << endl;
+
+    code = atoi(buf.c_str());
 
     switch(code) {
       case 0:
