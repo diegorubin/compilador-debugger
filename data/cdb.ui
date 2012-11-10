@@ -275,6 +275,27 @@
                     <property name="tab_fill">False</property>
                   </packing>
                 </child>
+                <child>
+                  <object class="GtkTextView" id="txtSourcecode">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="editable">False</property>
+                  </object>
+                  <packing>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child type="tab">
+                  <object class="GtkLabel" id="tabSourcecode">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Sourcecode</property>
+                  </object>
+                  <packing>
+                    <property name="position">1</property>
+                    <property name="tab_fill">False</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">True</property>

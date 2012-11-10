@@ -50,6 +50,8 @@ enum {
   WAITING=260,
   SYMTABCLEAR,
   SYMTABINSERT,
+  INSERTINPUTCODE,
+  CLEAR,
 };
 
 class WinMain: public Gtk::Window
@@ -90,6 +92,7 @@ private:
   Config configs;
 
   Glib::RefPtr<Gtk::Builder> m_refGlade;
+  Glib::RefPtr<Gtk::TextBuffer> tbfSource;
 
   // widgets
   ImageMenuItem *mnuQuit;
@@ -100,6 +103,8 @@ private:
 
   TreeView *trvSymtab;
 	ModelColumns mdlColumn;
+
+	TextView *txtSourcecode;
 
   Glib::RefPtr<StatusIcon> systray;
   Glib::RefPtr<Gtk::UIManager> mnuSystray;
@@ -127,6 +132,7 @@ private:
   // aux methods
   void insert_row_in_symtab(std::string data);
   void load_symtab();
+  void insert_source(std::string data);
 
 };
 

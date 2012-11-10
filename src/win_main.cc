@@ -37,6 +37,7 @@ WinMain::WinMain(BaseObjectType* cobject,
 
   // get widgets
   m_refGlade->get_widget("trvSymtab", trvSymtab);
+  m_refGlade->get_widget("txtSourcecode", txtSourcecode);
 
   m_refGlade->get_widget("lblStatus", lblStatus);
   lblStatus->set_text("Esperando");
@@ -171,8 +172,6 @@ bool WinMain::inputcall(Glib::IOCondition io_condition)
     inputchannel->read_line(buf);
     data = buf;
 
-    cout << "recebendo " << data << endl;
-
     switch(codecommand) {
       case WAITING:
         codecommand = atoi(buf.c_str());
@@ -181,11 +180,23 @@ bool WinMain::inputcall(Glib::IOCondition io_condition)
       case SYMTABCLEAR:
         lblStatus->set_text("Apagando Symtab");
         rows.clear();
+        load_symtab();
         codecommand = WAITING;
         break;
       case SYMTABINSERT:
         lblStatus->set_text("Inserindo na Symtab");
         insert_row_in_symtab(data);
+        codecommand = WAITING;
+        break;
+      case INSERTINPUTCODE:
+        lblStatus->set_text("Inserindo Sourcecode");
+        insert_source(data);
+        codecommand = WAITING;
+        break;
+      case CLEAR:
+        lblStatus->set_text("Limpando");
+        rows.clear();
+        load_symtab();
         codecommand = WAITING;
         break;
       default:
@@ -247,7 +258,6 @@ void WinMain::load_symtab()
     
     k = 0;
     while(std::getline(lineStream,cell,',')) {
-      cout << cell << endl;
       cols[k++] = cell;
     }
 
@@ -264,5 +274,13 @@ void WinMain::load_symtab()
   trvSymtab->append_column(_("ID Type"), mdlColumn.idtype);
   trvSymtab->append_column(_("Offset"), mdlColumn.offset);
 
+}
+
+void WinMain::insert_source(std::string data)
+{
+  tbfSource = Gtk::TextBuffer::create();
+
+  tbfSource->set_text(data);
+  txtSourcecode->set_buffer(tbfSource);
 }
 
