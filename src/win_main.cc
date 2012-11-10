@@ -197,6 +197,7 @@ bool WinMain::inputcall(Glib::IOCondition io_condition)
         lblStatus->set_text("Limpando");
         rows.clear();
         load_symtab();
+        insert_source("");
         codecommand = WAITING;
         break;
       default:
