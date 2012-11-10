@@ -83,6 +83,8 @@ private:
   bool symtab;
   int codecommand;
 
+  std::list<std::string> rows;
+
   Glib::RefPtr<Glib::IOChannel> inputchannel;
 
   Config configs;
@@ -93,6 +95,8 @@ private:
   ImageMenuItem *mnuQuit;
   ImageMenuItem *mnuPreferences;
   ImageMenuItem *mnuAbout;
+
+  Label *lblStatus;
 
   TreeView *trvSymtab;
 	ModelColumns mdlColumn;
@@ -121,7 +125,9 @@ private:
   virtual void on_menu_help_about();
 
   // aux methods
-  virtual void insert_row_in_symtab(std::string data);
+  void insert_row_in_symtab(std::string data);
+  void load_symtab();
+
 };
 
 #endif //__WIN_MAIN_H_

@@ -38,6 +38,9 @@ WinMain::WinMain(BaseObjectType* cobject,
   // get widgets
   m_refGlade->get_widget("trvSymtab", trvSymtab);
 
+  m_refGlade->get_widget("lblStatus", lblStatus);
+  lblStatus->set_text("Esperando");
+
   m_refGlade->get_widget("mnuQuit", mnuQuit);
   m_refGlade->get_widget("mnuPreferences", mnuPreferences);
   m_refGlade->get_widget("mnuAbout", mnuAbout);
@@ -168,14 +171,22 @@ bool WinMain::inputcall(Glib::IOCondition io_condition)
     inputchannel->read_line(buf);
     data = buf;
 
-    cout << "Code command: " << codecommand << endl;
+    cout << "recebendo " << data << endl;
 
     switch(codecommand) {
       case WAITING:
         codecommand = atoi(buf.c_str());
+        lblStatus->set_text("Esperando");
         break;
       case SYMTABCLEAR:
+        lblStatus->set_text("Apagando Symtab");
+        rows.clear();
+        codecommand = WAITING;
+        break;
+      case SYMTABINSERT:
+        lblStatus->set_text("Inserindo na Symtab");
         insert_row_in_symtab(data);
+        codecommand = WAITING;
         break;
       default:
         codecommand = atoi(buf.c_str());
@@ -213,11 +224,45 @@ void WinMain::on_menu_help_about()
 // methods
 void WinMain::insert_row_in_symtab(std::string data)
 {
-  std::stringstream lineStream(data);
-  std::string cell;
+  rows.push_back(data);
+  load_symtab();
+}
 
-  while(std::getline(lineStream,cell,',')) {
-    cout << cell;
+void WinMain::load_symtab()
+{
+  int k = 0;
+  
+  std::string cell;
+  std::list<std::string> tmp = rows;
+
+  std::string cols[6];
+
+  treSymtab->clear();
+  trvSymtab->remove_all_columns();
+
+  while(!tmp.empty()){
+    Gtk::TreeModel::Row row = *(treSymtab->append());
+
+    std::stringstream lineStream(tmp.front());
+    
+    k = 0;
+    while(std::getline(lineStream,cell,',')) {
+      cout << cell << endl;
+      cols[k++] = cell;
+    }
+
+    row[mdlColumn.id] = cols[0];
+    row[mdlColumn.dttype] = cols[1];
+    row[mdlColumn.idtype] = cols[2];
+    row[mdlColumn.offset] = cols[3];
+
+    tmp.pop_front();
   }
+
+  trvSymtab->append_column("ID", mdlColumn.id);
+  trvSymtab->append_column(_("Data Type"), mdlColumn.dttype);
+  trvSymtab->append_column(_("ID Type"), mdlColumn.idtype);
+  trvSymtab->append_column(_("Offset"), mdlColumn.offset);
+
 }
 
