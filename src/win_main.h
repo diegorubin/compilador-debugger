@@ -54,6 +54,20 @@ enum {
   CLEAR,
 };
 
+enum {
+  INTEGER=2053,
+  REAL,
+  BOOLEAN,
+};
+
+enum {
+  SYMTAB_IDTYPE_VARIABLE=1,
+  SYMTAB_IDTYPE_CONSTANT,
+  SYMTAB_IDTYPE_PROCEDURE,
+  SYMTAB_IDTYPE_FUNCTION,
+  SYMTAB_IDTYPE_PARAMETER,
+};
+
 class WinMain: public Gtk::Window
 {
 public:

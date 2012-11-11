@@ -22,6 +22,20 @@
 
 #include "win_main.h"
 
+char *dtypes[] = {
+  "INTEGER",
+  "REAL",
+  "BOOLEAN",
+};
+
+char *idtypes[] = {
+  "VARIABLE",
+  "CONSTANT",
+  "PROCEDURE",
+  "FUNCTION",
+  "PARAMETER",
+};
+
 WinMain::WinMain(BaseObjectType* cobject, 
                  const Glib::RefPtr<Gtk::Builder>& refGlade)
 : Gtk::Window(cobject),
@@ -243,6 +257,7 @@ void WinMain::insert_row_in_symtab(std::string data)
 void WinMain::load_symtab()
 {
   int k = 0;
+  int dtype;
   
   std::string cell;
   std::list<std::string> tmp = rows;
@@ -263,8 +278,13 @@ void WinMain::load_symtab()
     }
 
     row[mdlColumn.id] = cols[0];
-    row[mdlColumn.dttype] = cols[1];
-    row[mdlColumn.idtype] = cols[2];
+    dtype = atoi(cols[1].c_str()) - INTEGER;
+    if(dtype < 0)
+      row[mdlColumn.dttype] = "VOID";
+    else
+      row[mdlColumn.dttype] = dtypes[dtype];
+
+    row[mdlColumn.idtype] = idtypes[atoi(cols[2].c_str()) -1];
     row[mdlColumn.offset] = cols[3];
 
     tmp.pop_front();
